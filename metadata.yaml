@@ -1,0 +1,37 @@
+name: astrbot_plugin_grasp_bilicard
+display_name: Grasp-BiliCard
+short_desc: 收到 B 站卡片，这一轮就能看到画面和原话：9 格宫格约 400 token，5 分钟视频约 8 秒（处理耗时，不含排队），不经过第二个模型
+desc: >
+  都是同类插件，原本我没想降维打击！
+
+  · 收到 B 站分享卡片，自动下载、截几张画面、取字幕或转写，把画面和原话交给这一轮对话。
+  群里私聊都行：发卡片、引用卡片、直接打 BV 号都能触发。
+
+  · 5 分钟的视频约 8 秒处理完（字幕齐全时），要本机转写约 20 秒；从插件开始处理算起，不含排队。
+  9 格宫格约 400 token，逐帧模式约 3500。结果只在这一轮可见，不进聊天记录，也不转发。
+
+  · 能处理的：普通投稿（BV / av，横屏竖屏都行）、短链（b23.tv / bili2233.cn）、
+  多 P 视频（带 p=3 就只处理第 3 P）、自带字幕的视频、纯音乐和空镜。
+  番剧、课程的 ep / ss 链接常常解析不到 BV，只能给官方故事板缩略图；
+  连故事板也没有时只给标题，不编内容。
+
+  · 下载不到走官方故事板；字幕对不上就换轨，再不行转写；纯音乐不会被当成台词。
+  群里默认要 @ 才处理，可以按人限额，临时文件 20 分钟后自动清。
+
+  · 做法：yt-dlp 下 480P 到临时目录，缩成 64×36 逐帧比较变化切段，
+  每段挑最清晰的一帧拼成带编号的宫格，看完删视频。
+version: v0.1.0
+author: Routine
+repo: "https://github.com/routineyawn/astrbot_plugin_grasp_bilicard"
+astrbot_version: ">=4.0.0"
+social_link: "https://github.com/routineyawn/astrbot_plugin_grasp_bilicard"
+tags:
+  - bilibili
+  - B站
+  - 视频
+  - video
+  - 看视频
+  - 卡片
+  - video-understanding
+support_platforms:
+  - aiocqhttp

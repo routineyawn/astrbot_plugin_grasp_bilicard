@@ -1,0 +1,213 @@
+﻿{
+  "entry": {
+    "type": "object",
+    "description": "入口：什么消息算数、等多久、谁算数",
+    "items": {
+      "watch_qq_card": {
+        "description": "监听 QQ 里的 B 站分享卡片",
+        "type": "bool",
+        "default": true,
+        "hint": "关掉后插件完全不动，不会下载任何东西"
+      },
+      "prefetch_on_card": {
+        "description": "卡片到达就开始下载",
+        "type": "bool",
+        "default": true,
+        "hint": "群里从发卡片到 @ 通常隔几十秒，这段空档用来下载；关掉后每次都要现场等下载"
+      },
+      "require_at_in_group": {
+        "description": "群里要 @ 才处理",
+        "type": "bool",
+        "default": true,
+        "hint": "关掉后群里任何人发卡片都会处理，更吵也更贵"
+      },
+      "card_wait_seconds": {
+        "type": "int",
+        "default": 300,
+        "hint": "群里先发卡片、后 @ 时，这张卡片等多少秒。超过就忘掉（最短 30 秒）"
+      },
+      "daily_limit": {
+        "type": "int",
+        "default": 0,
+        "hint": "同一个人每天最多处理几条视频；0 表示不限。群里人多时可以填个 10 挡一挡"
+      },
+      "extra_sites": {
+        "description": "额外允许的站点域名（可选）",
+        "type": "string",
+        "default": "",
+        "hint": "默认只认 b23.tv / bilibili.com。逗号分隔，比如 douyin.com,xiaohongshu.com；交给 yt-dlp 下载，不一定都支持"
+      }
+    }
+  },
+  "visual": {
+    "type": "object",
+    "description": "画面：截多少、怎么排、多少像素",
+    "items": {
+      "frame_style": {
+        "description": "画面呈现方式",
+        "type": "string",
+        "default": "board",
+        "options": [
+          "board",
+          "frames"
+        ],
+        "hint": "board 拼成一张宫格图，最省 token；frames 是每格一张独立图，更清楚但贵得多"
+      },
+      "board_cells": {
+        "description": "宫格最多几格",
+        "type": "int",
+        "default": 9,
+        "hint": "这是上限：平缓的视频会自动降到 6 格，起伏大的用满这个数；格数太多每格会小到认不出字，还会按 640k 像素预算再压一次，9 格约 350×194/格"
+      },
+      "board_budget": {
+        "type": "int",
+        "description": "宫格整图像素预算",
+        "hint": "整图像素预算，直接决定 token：640000约418，420000约274，320000约212，250000约158，900000约569；低于250000格内字会认不出",
+        "default": 640000
+      },
+      "scan_fps": {
+        "type": "int",
+        "description": "扫画面的帧率",
+        "hint": "越高分段越细、越慢。4 约 4.8 秒，8 约 8.5 秒，2 约 2.4 秒；平缓视频用 2 就够",
+        "default": 4
+      },
+      "pick_sharp": {
+        "description": "每段挑最清晰的一帧",
+        "type": "bool",
+        "default": true,
+        "hint": "一段里取 3 个候选点按清晰度选一张，避开转场和运动模糊；关掉就只取段中点，更快"
+      },
+      "frame_count": {
+        "description": "最多截几张画面",
+        "type": "int",
+        "default": 6,
+        "hint": "frame_style=frames 时用；每张接近一张图的钱"
+      },
+      "clip_seconds": {
+        "description": "画面和声音只看视频开头这一段，省流量也省时间；长视频后面的内容看不到",
+        "type": "int",
+        "default": 300,
+        "hint": "视频再长也只处理前这么多秒，控制下载量和等待时间"
+      },
+      "size_limit_mb": {
+        "description": "下载大小上限（MB）",
+        "type": "int",
+        "default": 120,
+        "hint": "超过这个大小的视频直接放弃，只给标题"
+      }
+    }
+  },
+  "text": {
+    "type": "object",
+    "description": "文字：字幕、简介、转写、提示词",
+    "items": {
+      "prefer_subtitles": {
+        "description": "优先用视频自带字幕",
+        "type": "bool",
+        "default": true,
+        "hint": "有 UP 主上传或 AI 字幕时直接用字幕，比转写准；拿不到再走下面的转写设置"
+      },
+      "subtitle_limit": {
+        "description": "字幕最多用多少字",
+        "type": "int",
+        "default": 800,
+        "hint": "字幕覆盖整片，画面只看前 N 秒；超过这个字数就截断。0 = 不截断"
+      },
+      "include_desc": {
+        "type": "bool",
+        "description": "带上视频简介",
+        "hint": "UP 主写在简介里的说明通常最能说明这条视频想讲什么；关掉就只看画面和字幕",
+        "default": true
+      },
+      "include_tags": {
+        "type": "bool",
+        "description": "带上分区和标签",
+        "hint": "让模型先知道这是哪一区的视频（科技/游戏/鬼畜），定调子很便宜",
+        "default": true
+      },
+      "comments_max": {
+        "type": "int",
+        "description": "带上几条热评",
+        "hint": "评论区常有「课代表总结」，能补画面和字幕说不清的地方；0 = 不带",
+        "default": 5
+      },
+      "comments_max_no_subtitle": {
+        "type": "int",
+        "description": "没有字幕时带几条热评",
+        "hint": "这类视频画面信息最少，评论是唯一的语义来源，可以多给几条",
+        "default": 8
+      },
+      "comments_chars": {
+        "type": "int",
+        "description": "每条热评最多留几个字",
+        "hint": "热评常常很长，只留开头就够定性；超出的截断",
+        "default": 200
+      },
+      "asr_mode": {
+        "description": "要不要把声音转成文字",
+        "type": "string",
+        "default": "off",
+        "options": [
+          "off",
+          "local",
+          "openai"
+        ],
+        "hint": "off 只要画面；local 用本机 sherpa-onnx；openai 用任意 OpenAI 兼容的 /audio/transcriptions 接口"
+      },
+      "local_asr_home": {
+        "description": "本机语音识别目录（asr_mode=local 时用）",
+        "type": "string",
+        "default": "",
+        "hint": "目录里要有 sherpa-onnx-offline.exe、model.int8.onnx、tokens.txt"
+      },
+      "remote_asr_base": {
+        "description": "远程转写接口地址（asr_mode=openai 时用）",
+        "type": "string",
+        "default": "https://api.siliconflow.cn/v1",
+        "hint": "硅基流动、OpenAI、Groq、本机 faster-whisper 服务都行，填到 /v1 为止"
+      },
+      "remote_asr_key": {
+        "description": "远程转写 API Key",
+        "type": "string",
+        "default": "",
+        "hint": "只存在本地配置里，日志和对话里都不会打印"
+      },
+      "remote_asr_model": {
+        "description": "远程转写模型名",
+        "type": "string",
+        "default": "FunAudioLLM/SenseVoiceSmall",
+        "hint": "硅基流动用 FunAudioLLM/SenseVoiceSmall；OpenAI 用 whisper-1"
+      },
+      "prompt_template": {
+        "description": "自定义引导语（可选）",
+        "type": "string",
+        "default": "",
+        "hint": "留空用内置文案。整段替换，可用占位符：$title 标题、$length 时长、$cut 只看前几分钟的说明、$shot 画面说明与时间清单、$sound 字幕或转写"
+      }
+    }
+  },
+  "safety": {
+    "type": "object",
+    "description": "安全与运行：Cookie、ffmpeg、清理",
+    "items": {
+      "bili_cookie": {
+        "description": "B 站 Cookie（可选）",
+        "type": "string",
+        "default": "",
+        "hint": "默认不填也能下大多数视频（360P/480P）；只填 SESSDATA 的值就行，插件会自己补成 Cookie 头；要 1080P 或遇到限制再填"
+      },
+      "ffmpeg_bin": {
+        "description": "ffmpeg 可执行文件路径",
+        "type": "string",
+        "default": "",
+        "hint": "留空会自动找 PATH 和 C:\\ffmpeg\\bin；要填就填到 ffmpeg.exe"
+      },
+      "sweep_minutes": {
+        "description": "临时文件保留分钟数",
+        "type": "int",
+        "default": 20,
+        "hint": "截好的画面要留到模型真正读图那一刻，太小会被提前清掉；磁盘紧张就调小"
+      }
+    }
+  }
+}
